@@ -1,0 +1,66 @@
+
+FUNCTION_BLOCK caida
+
+VAR_INPUT
+	velocidad : REAL;
+	altura : REAL;
+END_VAR
+
+VAR_OUTPUT
+	propulsion : REAL;
+END_VAR
+
+FUZZIFY velocidad
+	TERM muylenta := (0,1)(50,0);
+	TERM lenta := (20,0)(135,1)(250,0);
+	TERM mediabaja := (100,0)(300,1)(500,0);
+	TERM mediaalta := (300,0)(550,1)(800,0);
+	TERM rapida := (600,0)(1000,1);
+END_FUZZIFY
+
+FUZZIFY altura
+	TERM baja := (0,1)(3,0);
+	TERM media := (1,0)(3.25,1)(5.5,0);
+	TERM alta := (4,0)(6,1)(8,0);
+	TERM maxima := (6.5,0)(10,1);
+END_FUZZIFY	
+
+DEFUZZIFY propulsion
+	TERM minima := (0,1)(2.5,0);
+	TERM baja := (1,0)(2.75,1)(4.5,0);
+	TERM media := (3.5,0)(5,1)(6.5,0);
+	TERM alta := (5.5,0)(7,1)(8.5,0);
+	TERM maxima := (7,0)(8.5,1)(10,0);
+	METHOD : COG;
+	DEFAULT := 0;
+END_DEFUZZIFY
+
+RULEBLOCK rul
+	AND : MIN;
+	ACT : MIN;
+	ACCU : MAX;
+
+	RULE 1: IF velocidad IS rapida AND altura IS baja THEN propulsion IS maxima;
+	RULE 2: IF velocidad IS rapida AND altura IS media THEN propulsion IS alta;
+	RULE 3: IF velocidad IS rapida AND altura IS alta THEN propulsion IS minima;
+	RULE 4: IF velocidad IS rapida AND altura IS maxima THEN propulsion IS minima;
+	RULE 5: IF velocidad IS mediaalta AND altura IS baja THEN propulsion IS alta;
+	RULE 6: IF velocidad IS mediaalta AND altura IS media THEN propulsion IS alta;
+	RULE 7: IF velocidad IS mediaalta AND altura IS alta THEN propulsion IS minima;
+	RULE 8: IF velocidad IS mediaalta AND altura IS maxima THEN propulsion IS minima;
+	RULE 9: IF velocidad IS mediabaja AND altura IS baja THEN propulsion IS alta;
+	RULE 10: IF velocidad IS mediabaja AND altura IS media THEN propulsion IS media;
+	RULE 11: IF velocidad IS mediabaja AND altura IS alta THEN propulsion IS minima;
+	RULE 12: IF velocidad IS mediabaja AND altura IS maxima THEN propulsion IS minima;	
+	RULE 13: IF velocidad IS lenta AND altura IS baja THEN propulsion IS media;
+	RULE 14: IF velocidad IS lenta AND altura IS media THEN propulsion IS baja;
+	RULE 15: IF velocidad IS lenta AND altura IS alta THEN propulsion IS minima;
+	RULE 16: IF velocidad IS lenta AND altura IS maxima THEN propulsion IS minima;
+	RULE 17: IF velocidad IS muylenta AND altura IS baja THEN propulsion IS baja;
+	RULE 18: IF velocidad IS muylenta AND altura IS media THEN propulsion IS minima;
+	RULE 19: IF velocidad IS muylenta AND altura IS alta THEN propulsion IS minima;
+	RULE 20: IF velocidad IS muylenta AND altura IS maxima THEN propulsion IS minima;
+
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK
